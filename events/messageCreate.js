@@ -6,6 +6,8 @@ const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const dom = new JSDOM();
 const document = dom.window.document;
+const guild = client.guilds.cache.get(process.env.server)
+
 process.env.style = `
 div{
     display: inline-block;
@@ -124,7 +126,7 @@ if(message.content.startsWith('!close')){
 fs.writeFileSync('./data/openedmails.json', JSON.stringify(newData), "utf-8", function(err){
   if(err) console.log(err)
 });
-mailChannel.edit({name:"📪┆" + message.author.username, topic: "Closed - " + message.author.id}).then(message.reply("ModMail Closed!"))
+mailChannel.edit({name: message.author.username, topic: "Closed - " + message.author.id}).then(message.reply("ModMail Closed!"))
 } else {
   content = message.content;
 }
@@ -149,7 +151,7 @@ if(message.content.startsWith('!close')){
 fs.writeFileSync('./data/openedmails.json', JSON.stringify(newData), "utf-8", function(err){
   if(err) console.log(err)
 });
-message.channel.edit({name:"📪┆" + subjectObj.user.username, topic: "Closed - " + subjectId}).then(message.reply("ModMail Closed!"))
+message.channel.edit({name:"closed-" + subjectObj.user.username, topic: "Closed - " + subjectId}).then(message.reply("ModMail Closed!"))
     subjectObj.send({content:'__**DeathManager:**__\n'+content,files:fileArr}).then(()=>message.react(process.env.sentEmoji)).catch(e=>message.reply(e.stack))
   return;
   }
@@ -519,7 +521,7 @@ let TAG;
 
 				const save = Promise.resolve(
 					fs.writeFileSync(
-					`${message.channel.name}.html`,
+					`${message.channel.name.split('-')[1]}.html`,
 					result,
 					"utf8",
 					function (err) {
@@ -530,20 +532,20 @@ message.channel.send('Transcripting and Deleting...')
      save.then(
 		trChannel.send({
 					files: [
-`./${message.channel.name}.html`,
+`./${message.channel.name.split('-')[1]}.html`,
 					], content: 'ModMail deleted by: '+message.author.username+'\n at: '+message.createdAt.toLocaleString('en-IN',{
             timezone:'Asia/Kolkata'
           })
 				}).then(()=> {
 					message.channel.delete()
-					fs.unlinkSync(`${message.channel.name}.html`)
+					fs.unlinkSync(`${message.channel.name.split('-')[1]}.html`)
 				}))
 
      return;
     }
   // console.log(!subject.length)
     if(!subject.length) return;
-    if(message.content.startsWith('!r')){  subjectObj.send({content:'__**DeathManager:**__\n'+message.content.split('!r')[1],files:fileArr}).then(()=>message.react(process.env.sentEmoji)).catch(e=>message.reply(e.stack))
+    if(message.content.startsWith('!r')){  subjectObj.send({content:`__**${guild.name}: **${message.author.username}__\n`+message.content.split('!r')[1],files:fileArr}).then(()=>message.react(process.env.sentEmoji)).catch(e=>message.reply(e.stack))
    
     }
           }
