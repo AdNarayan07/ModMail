@@ -22,5 +22,5 @@
   "devDependencies": {
     "node": "^16.17.0"
   },
-  "description": ""
+  "description": "A Simple ModMail Bot for Discord."
 }
