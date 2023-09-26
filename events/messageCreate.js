@@ -87,7 +87,7 @@ if(message.content.startsWith('!close')) return message.reply('There is no modma
     const createdChannel = await guild.channels.create(
         message.author.username,
       {
-        reason: "Recieved a DM from" + message.author.username,
+        reason: "Recieved a DM from " + message.author.username,
         type: "GUILD_TEXT",
         topic: "Opened - " + message.author.id,
         parent: process.env.parentCategory
@@ -516,7 +516,8 @@ let TAG;
 				});
 
 				let data = html.outerHTML;
-
+				    data = data.replace(`@&${process.env.moderator}`,`@Moderator`);
+	    			
 				let result = data.split(">").join(">\n\n");
 
 				const save = Promise.resolve(
