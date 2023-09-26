@@ -516,13 +516,10 @@ let TAG;
 				});
 
 				let data = html.outerHTML;
-<<<<<<< HEAD
 				    data = data.replace(`@&${process.env.moderator}`,`@Moderator`);
 	    			
-=======
             data = data.replace(`@&${process.env.moderator}`,`@Moderator`);
       
->>>>>>> adeb33b (Fixed ignored files)
 				let result = data.split(">").join(">\n\n");
 
 				const save = Promise.resolve(
