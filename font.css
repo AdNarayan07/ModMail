@@ -1,0 +1,6 @@
+@font-face {
+    font-family: 'gg sans Normal Regular';
+    font-style: normal;
+    font-weight: normal;
+    src: local('gg sans Normal Regular'), url('https://mdn.github.io/web-fonts/LatoReg.ttf') format('woff');
+    }
