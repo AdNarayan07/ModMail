@@ -1,1 +1,12 @@
-[{"user":"userID","channel":"channelID","status":1,"messageAttachments":{"messsageid":["urls"]}},{"user":"819800139485020160","channel":"1157638481795887174","status":1,"messageAttachments":{}}]
+[
+    {
+        "user": "userID",
+        "channel": "channelID",
+        "status": 1,
+        "messageAttachments": {
+            "messsageid": [
+                "urls"
+            ]
+        }
+    }
+]

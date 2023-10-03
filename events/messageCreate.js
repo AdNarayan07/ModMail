@@ -10,10 +10,10 @@ module.exports = async function handle(message) {
     message.attachments.forEach((attachment) => {
         let attURL = attachment.proxyURL.replace("media", "cdn").replace(".net", ".com");
         fileArr.push(attURL);
-    }) //memberObj is an array [{user, channel, messageAttachment, status}]
+    }) 
 
     if(message.channel.type == "DM"){
-        let memberObj = mails.filter(e => e.user == message.author.id);
+        let memberObj = mails.filter(e => e.user == message.author.id);//memberObj is an array [{user, channel, messageAttachment, status}]
         if(message.author.bot) return; 
 
         if(memberObj.length === 0) { //Means no channel available for member
@@ -31,13 +31,16 @@ module.exports = async function handle(message) {
         }
     }
 
-    if(message.channel.parentId === process.env.parentCategory) {
-        let memberObj = mails.filter(e => e.channel === message.channel.id);
-        let member = guild.members.cache.get(memberObj[0].user);
+    if(message.channel.parentId === process.env.parentCategory && message.channel.id !== process.env.trChannel) {
+        let memberObj = mails.filter(e => {
+            let x = e.channel == message.channel.id
+            return x;
+        });
         if(memberObj.length === 0) return console.log("memberObject not found");
+        let member = guild.members.cache.get(memberObj[0].user);
         if(!memberObj[0].status) {
             if(message.content.toLowerCase().startsWith('!close')) return message.reply("Modmail already closed!");
-            if(message.content.toLowerCase().startsWith('!del')) return deleteMail(memberObj, message);
+            if(message.content.toLowerCase().startsWith('!del')) return require('../functions/transcript')(memberObj, message);
             return;
         } else {
             if(fileArr.length !== 0){
@@ -96,11 +99,11 @@ async function openMail(message, files){
     console.log("New modmail opened")
 
     //informing the mods
-    createdChannel.send(`<@&${process.env.moderator}>, a new ModMail Opened by <@${message.author.id}>\n\n
+    createdChannel.send(`<@&${process.env.moderator}>, a new ModMail Opened by <@${message.author.id}>\n
         A guide to use the modmail:\n
         • \`!close MESSAGE\` Close the modmail with a final message.\n
         • \`!r MESSAGE\` Reply to the user with a message. If your message gets reacted with ${process.env.sentEmoji} emoji, it means the message has reached.\n
-        • \`!del\` Deletes the channel after saving the Transcript in logging channel.\n\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_`)
+        • \`!del\` Deletes the channel after saving the Transcript in logging channel.\n`)
     createdChannel.send({content:'\n__**'+message.author.username+':**__\n'+message.content, files}).then(()=>message.react(process.env.sentEmoji)).catch(e=>message.reply(e.stack))
 
     //informing the user
@@ -121,14 +124,4 @@ function closeChannel(memberObj, message, notify, files) {
     fs.writeFileSync('./data/openedmails.json', JSON.stringify(newData), "utf-8", function(err){
         if(err) console.log(err)
     });
-}
-
-async function deleteMail(memberObj, message){
-    let x = require('../functions/transcript')(message)
-    x.then(()=>{
-        const newData = mails.filter(e => e.user !== memberObj[0].user)
-        fs.writeFileSync('./data/openedmails.json', JSON.stringify(newData), "utf-8", function(err){
-          if(err) console.log(err)
-        });
-    })
 }
