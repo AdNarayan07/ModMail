@@ -1,8 +1,13 @@
-const md = require('markdown-it')({
-    linkify: true,
-    breaks: true
-  });
-function toHTML(markdownText){
+let md;
+function toHTML(markdownText, breaks){
+    if(breaks){
+        md  = require('markdown-it')({
+            linkify: true,
+            breaks: true
+          });
+    } else {
+        md  = require('markdown-it')();
+    }
 const regexUl = /__(.*?)__/g;
 const regexLtag = /&lt;l(.*?)&gt;/g;
 let x = markdownText.split('\n')

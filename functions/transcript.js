@@ -7,6 +7,8 @@ const document = dom.window.document;
 const fs = require("fs");
 const attachmentJSON = require("../data/openedmails.json")
 const css = require("../data/uris.json").css
+const replySVG =  require("../data/uris.json").replySVG
+const picSVG = require("../data/uris.json").picSVG
 
 module.exports = async (memberObj, interaction) => {
     let messageCollection = new Discord.Collection(); //creating a collection
@@ -34,7 +36,28 @@ module.exports = async (memberObj, interaction) => {
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
     <link rel="stylesheet" href="${css}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
-    <script> window.onload = hljs.highlightAll() </script>
+    <script>
+    window.onload = hljs.highlightAll();
+   async function glow(event){
+        let link = event.target.parentElement.href || event.target.parentElement.parentElement.href || event.target.parentElement.parentElement.parentElement.href || event.target.href
+        let element = document.getElementById(link.split('#')[1]);
+            element.style.backgroundColor = "hsl(222.86deg 6.67% 20.59%)";
+        let light = 20.59
+        while(light < 27) {
+            light += 0.5
+            await sleep(30)
+            element.style.backgroundColor = \`hsl(222.86deg 6.67% \${light}%)\`
+            event.target.onClick = "break";
+        }
+        while(light > 21){
+            light -= 0.5
+            await sleep(30)
+            element.style.backgroundColor = \`hsl(222.86deg 6.67% \${light}%)\`
+            event.target.onClick = "break";
+        }
+    }
+    const sleep = (time) => new Promise(res => setTimeout(res, time));
+    </script>
     `
     let parentContainer = document.createElement("div");//<div class = "parentContainer">All messages</div>
     parentContainer.className = "parent-container";
@@ -92,7 +115,20 @@ msgs.forEach(async (msg) => { //Adding each message to html
         referenceContainer.className = 'reply'
         if(msg.reference) {
             let referencedMessage = msgs.get(msg.reference.messageId);
-            let x = referencedMessage.content.replaceAll('\n', ' ');
+            let x;
+            let image;
+            let tag = "";
+            let color = "";
+            let bot = "";
+            let dest = "";
+            let pic = "";
+            if(!referencedMessage) {
+                x = "*Original message was deleted*";
+                image = replySVG;
+                color = "white";
+            } else {
+            x = referencedMessage.content.replaceAll('\n', ' ');
+            dest = referencedMessage.id;
             referencedMessage.mentions.users.forEach((user) => {
                 x = x.replace(`<@${user.id}>`, '<l class = \'mention\'>@'+user.username+'</l>')
             })
@@ -102,18 +138,14 @@ msgs.forEach(async (msg) => { //Adding each message to html
             referencedMessage.mentions.channels.forEach((channel) => {
                 x = x.replaceAll(`<#${channel.id}>`, '<l class = \'mention\'>#'+channel.name+'</l>')
             })
-            let referencedContent = require('../functions/mdtoHTML')(x)
-            let image;
-            let tag;
-            let color;
-            let bot = "";
-            if(!referencedMessage.author){ 
+                if(!referencedMessage.author){ 
                 image = 'https://cdn.discordapp.com/embed/avatars/1.png?size=1024'
                 tag = 'Deleted User'
                 color = "White"
             } else {
                 image =  referencedMessage.author.displayAvatarURL()
                 tag = referencedMessage.member.displayName || referencedMessage.author.username
+                tag = "@" + tag
                     if ( referencedMessage.member ) {
                     let role = referencedMessage.member.roles.color
                     if (!role) color = "#ffffff"
@@ -121,10 +153,12 @@ msgs.forEach(async (msg) => { //Adding each message to html
                     } else color = "#ffffff"
                 if(referencedMessage.author.bot) bot = '<span style="font-weight: bold; background: #5c68ee; padding: 0.05em 0.5em 0.1em 0.5em; font-size: 0.7em; border-radius: 0.3em; position:relative; top: -0.2em">BOT</span>'
             }
-            
+            if(referencedMessage.attachments.size > 0) pic = `<img src = "${picSVG}">`
+            }
+            let referencedContent = require('../functions/mdtoHTML')(x);
             let referencedText = `
-            <a href = "#${referencedMessage.id}"><img style ="top: 1em; position: relative;" src="https://cdn.discordapp.com/attachments/1156217464225546330/1158782641068314634/Arrow.svg?ex=651d7fee&is=651c2e6e&hm=d552867d43e6cb116fe20364e0a06767403157d142c91f3cbc27e08d134748f1&">
-            <img src="${image}" class="reply"> ${bot}<span style = "color: ${color}; font-weight: bold">@${tag}</span> ${referencedContent}</a>
+            <a href = "#${dest}"><img style ="top: 1em; position: relative;" src="https://cdn.discordapp.com/attachments/1156217464225546330/1158782641068314634/Arrow.svg?ex=651d7fee&is=651c2e6e&hm=d552867d43e6cb116fe20364e0a06767403157d142c91f3cbc27e08d134748f1&">
+            <img src="${image}" class="reply"> ${bot}<span style = "color: ${color}; font-weight: bold">${tag}</span> ${referencedContent} ${pic}</a>
             `
             referenceContainer.innerHTML = referencedText;
             messageContainer.appendChild(referenceContainer);
@@ -216,8 +250,9 @@ msgs.forEach(async (msg) => { //Adding each message to html
         }
         let i = 0;
         msgAttach.forEach(async (attach) => {
-            let theUrl = urlArr[i];
+            let theUrl = urlArr[i] || 'data:text;base2,Can\'t find the attachment cache';
             i++;
+            if(!attach.contentType) attach.contentType = 'file';
             if(attach.contentType.startsWith('image')){
                 let imgAnc = document.createElement("a"); //anchor element
                 imgAnc.setAttribute("href", theUrl);
@@ -350,7 +385,7 @@ msgs.forEach(async (msg) => { //Adding each message to html
             files: [`./${interaction.channel.name.split('-')[1]}.html`],
             content: 'ModMail deleted by: '+interaction.author.username+'\n at: '+interaction.createdAt.toLocaleString('en-IN',{timezone:process.env.timeZone})
             }).then(()=> {
-                interaction.channel.delete().then(()=>{
+               interaction.channel.delete().then(()=>{
         const newData = attachmentJSON.filter(e => e.user !== memberObj[0].user)
         fs.writeFileSync('./data/openedmails.json', JSON.stringify(newData), "utf-8", function(err){
           if(err) console.log(err)

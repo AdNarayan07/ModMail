@@ -230,8 +230,8 @@ body {
   width: 90%;
 }
 .message-container:hover {
- background-color: #2e3035;
- transition: 0.05s;
+ background-color: #2e3035 !important;
+ transition: 0.05s !important;
 }
 .parent-container {
   padding: 25px;

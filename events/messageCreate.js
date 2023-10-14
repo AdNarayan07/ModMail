@@ -38,11 +38,7 @@ module.exports = async function handle(message) {
         });
         if(memberObj.length === 0) return console.log("memberObject not found");
         let member = guild.members.cache.get(memberObj[0].user);
-        if(!memberObj[0].status) {
-            if(message.content.toLowerCase().startsWith('!close')) return message.reply("Modmail already closed!");
-            if(message.content.toLowerCase().startsWith('!del')) return require('../functions/transcript')(memberObj, message);
-            return;
-        } else {
+        
             if(fileArr.length !== 0){
                 let dumpyard = client.channels.cache.get(process.env.dumpyard);
                 let dumped = await dumpyard.send({content:message.id, files:fileArr}).catch((e)=>message.reply(e.stack));
@@ -58,6 +54,11 @@ module.exports = async function handle(message) {
                 if(err) console.log(err)
                 })
             }
+        if(!memberObj[0].status) {
+            if(message.content.toLowerCase().startsWith('!close')) return message.reply("Modmail already closed!");
+            if(message.content.toLowerCase().startsWith('!del')) return require('../functions/transcript')(memberObj, message);
+            return;
+        } else {
             if(message.content.toLowerCase().startsWith('!close')) return closeChannel(memberObj, message, member, fileArr);
             if(message.content.toLowerCase().startsWith('!del')) return message.reply('Close the mail first, use `!close MESSAGE`');
             if(message.content.toLowerCase().startsWith('!r')) return member.send({content:'**__'+message.author.username+':__**\n'+message.content.split('!r')[1], files:fileArr}).then(()=>message.react(process.env.sentEmoji)).catch(e=>message.reply(e.stack))
