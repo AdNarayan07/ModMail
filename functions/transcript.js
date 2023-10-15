@@ -128,6 +128,8 @@ msgs.forEach(async (msg) => { //Adding each message to html
                 color = "white";
             } else {
             x = referencedMessage.content.replaceAll('\n', ' ');
+            if(x==="") x = "*Click to see attachment*";
+
             dest = referencedMessage.id;
             referencedMessage.mentions.users.forEach((user) => {
                 x = x.replace(`<@${user.id}>`, '<l class = \'mention\'>@'+user.username+'</l>')
@@ -153,11 +155,11 @@ msgs.forEach(async (msg) => { //Adding each message to html
                     } else color = "#ffffff"
                 if(referencedMessage.author.bot) bot = '<span style="font-weight: bold; background: #5c68ee; padding: 0.05em 0.5em 0.1em 0.5em; font-size: 0.7em; border-radius: 0.3em; position:relative; top: -0.2em">BOT</span>'
             }
-            if(referencedMessage.attachments.size > 0) pic = `<img src = "${picSVG}">`
+            if(referencedMessage.attachments.size > 0) pic = `<img src = "${picSVG}" style = "width: 1.5em; top: 0.3em; position: relative">`
             }
             let referencedContent = require('../functions/mdtoHTML')(x);
             let referencedText = `
-            <a href = "#${dest}"><img style ="top: 1em; position: relative;" src="https://cdn.discordapp.com/attachments/1156217464225546330/1158782641068314634/Arrow.svg?ex=651d7fee&is=651c2e6e&hm=d552867d43e6cb116fe20364e0a06767403157d142c91f3cbc27e08d134748f1&">
+            <a onclick = "glow(event)" href = "#${dest}"><img style ="top: 1em; position: relative;" src="https://cdn.discordapp.com/attachments/1156217464225546330/1158782641068314634/Arrow.svg?ex=651d7fee&is=651c2e6e&hm=d552867d43e6cb116fe20364e0a06767403157d142c91f3cbc27e08d134748f1&">
             <img src="${image}" class="reply"> ${bot}<span style = "color: ${color}; font-weight: bold">${tag}</span> ${referencedContent} ${pic}</a>
             `
             referenceContainer.innerHTML = referencedText;
@@ -263,7 +265,7 @@ msgs.forEach(async (msg) => { //Adding each message to html
                 let newLine2 = document.createElement("br"); //another br
 
                 imgAtt.setAttribute("src", theUrl); //display image
-                imgAtt.setAttribute("style", "max-width: 60%; max-height: 50vh; border-radius: 10px");
+                imgAtt.setAttribute("style", "max-width: 60%; max-height: 50vh; border-radius: 10px; margin-bottom: 1em");
                 
                 imgAnc.appendChild(imgAtt); //attach image in container
                 msgSpan.appendChild(newLine1);
@@ -272,9 +274,10 @@ msgs.forEach(async (msg) => { //Adding each message to html
             } else if(attach.contentType.startsWith('video')){
                 let videoElement = document.createElement("video"); //video element
                 videoElement.controls = true; //enable controls
-                videoElement.style["max-width"] = "60vw";
-                videoElement.style["max-height"] = "50vh";
-                videoElement.style["border-radius"] = "10px";
+                videoElement.style["maxWidth"] = "60vw";
+                videoElement.style["maxHeight"] = "50vh";
+                videoElement.style["borderRadius"] = "10px";
+                videoElement.style["marginBottom"] = "1em";
 
                 let video = document.createElement("source"); //video source
                 video.setAttribute("src", theUrl);
@@ -291,6 +294,7 @@ msgs.forEach(async (msg) => { //Adding each message to html
                 let audioElement = document.createElement("audio"); //audio element
                 audioElement.controls = true; //enabling controls
                 audioElement.style["width"] = "60vw";
+                audioElement.style["marginBottom"] = "1em";
 
                 let audio = document.createElement("source"); //audio source
                 audio.setAttribute("src", theUrl);

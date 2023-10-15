@@ -265,10 +265,11 @@ hr.main{
  .file{
   color: #0acaff;
   background-color:#2b2d31; 
-  width: 60%w; 
+  width: 60vw; 
   padding:10px;
-  vertical-align: center;
+  vertical-align: middle;
   border-radius: 10px;
+  margin-bottom: 1em;
 }
 l.underline{
     text-decoration: underline
