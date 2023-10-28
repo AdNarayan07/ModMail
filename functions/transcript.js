@@ -388,7 +388,9 @@ msgs.forEach(async (msg) => { //Adding each message to html
         trChannel.send({
             files: [`./${interaction.channel.name.split('-')[1]}.html`],
             content: 'ModMail deleted by: '+interaction.author.username+'\n at: '+interaction.createdAt.toLocaleString('en-IN',{timezone:process.env.timeZone})
-            }).then(()=> {
+            }).then((sent)=> {
+                const url = sent.attachments.first().proxyURL.replace('media.discordapp.net','cdn.discordapp.com')
+                sent.edit(sent.content + `\n[View this Transcript](https://viewhtml.adityanarayan13.repl.co?url=${url})`)
                interaction.channel.delete().then(()=>{
         const newData = attachmentJSON.filter(e => e.user !== memberObj[0].user)
         fs.writeFileSync('./data/openedmails.json', JSON.stringify(newData), "utf-8", function(err){
