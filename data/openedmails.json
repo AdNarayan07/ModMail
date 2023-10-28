@@ -1,12 +1,1 @@
-[
-    {
-        "user": "userID",
-        "channel": "channelID",
-        "status": 1,
-        "messageAttachments": {
-            "messsageid": [
-                "urls"
-            ]
-        }
-    }
-]
+[{"user":"userID","channel":"channelID","status":1,"messageAttachments":{"messsageid":["urls"]}}]

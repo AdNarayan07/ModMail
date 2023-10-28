@@ -41,6 +41,7 @@ module.exports = async (memberObj, interaction) => {
    async function glow(event){
         let link = event.target.parentElement.href || event.target.parentElement.parentElement.href || event.target.parentElement.parentElement.parentElement.href || event.target.href
         let element = document.getElementById(link.split('#')[1]);
+        if(!element) return;
             element.style.backgroundColor = "hsl(222.86deg 6.67% 20.59%)";
         let light = 20.59
         while(light < 27) {
@@ -126,6 +127,7 @@ msgs.forEach(async (msg) => { //Adding each message to html
                 x = "*Original message was deleted*";
                 image = replySVG;
                 color = "white";
+                dest = msg.id;
             } else {
             x = referencedMessage.content.replaceAll('\n', ' ');
             if(x==="") x = "*Click to see attachment*";

@@ -25,7 +25,8 @@ module.exports = async function handle(message) {
             if(message.content.toLowerCase().startsWith('!close')) return message.reply("Modmail already closed!");
             openChannel(memberObj, message, fileArr);
         } else { //Modmail opened
-            let notify = client.channels.cache.get(memberObj[0].channel)
+            let notify = client.channels.cache.get(memberObj[0].channel);
+            if(!notify) return message.reply('Something went wrong, try again after a minute.')
             if(message.content.toLowerCase().startsWith('!close')) return closeChannel(memberObj, message, notify, fileArr);
             notify.send({content:'**__'+message.author.username+':__**\n'+message.content, files:fileArr}).catch(e=>message.reply(e.stack)).then(()=>message.react(process.env.sentEmoji))
         }
@@ -68,10 +69,6 @@ module.exports = async function handle(message) {
 }
 
 function openChannel(memberObj, message, files){
-    let channel = client.channels.cache.get(memberObj[0].channel)
-    channel.edit({name: message.author.username, topic: "Opened - " + message.author.id})
-    channel.send(`<@&${process.env.moderator}>, the ModMail is re-opened by <@${memberObj[0].user}>`)
-    channel.send({content:'**__'+message.author.username+':__**\n'+message.content, files}).then(()=>message.react(process.env.sentEmoji))
     message.channel.send("ModMail opened! Wait for the staff to adress you! If you wish to close the modmail, use the command \`!close REASON\`.");
     memberObj[0].status = 1;
     let newData = mails.filter(e => e.user !== message.author.id)
@@ -79,6 +76,11 @@ function openChannel(memberObj, message, files){
     fs.writeFileSync('./data/openedmails.json', JSON.stringify(newData), "utf-8", function(err){
         if(err) console.log(err)
     });
+    let channel = client.channels.cache.get(memberObj[0].channel)
+    if(!channel) return openMail(message, files);
+    channel.edit({name: message.author.username, topic: "Opened - " + message.author.id})
+    channel.send(`<@&${process.env.moderator}>, the ModMail is re-opened by <@${memberObj[0].user}>`)
+    channel.send({content:'**__'+message.author.username+':__**\n'+message.content, files}).then(()=>message.react(process.env.sentEmoji))
 }
 
 async function openMail(message, files){
